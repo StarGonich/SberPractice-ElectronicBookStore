@@ -43,10 +43,6 @@ public class OrderService {
         if (existingOrder.isPresent()) {
             Order order = existingOrder.get();
             int newCount = order.getCount() + count;
-            System.out.print("newCount =");
-            System.out.println(newCount);
-            System.out.print("book.get().getStockQuantity() =");
-            System.out.println(book.get().getStockQuantity());
             if (newCount > book.get().getStockQuantity()) {
                 throw new IllegalStateException("Запрашиваемое количество превышает доступный запас книги");
             }
@@ -54,10 +50,6 @@ public class OrderService {
             orderRepository.save(order);
             return order;
         } else {
-            System.out.print("count =");
-            System.out.println(count);
-            System.out.print("book.get().getStockQuantity() =");
-            System.out.println(book.get().getStockQuantity());
             if (count > book.get().getStockQuantity()) {
                 throw new IllegalStateException("Запрашиваемое количество превышает доступный запас книги");
             }

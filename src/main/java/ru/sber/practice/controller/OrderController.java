@@ -60,11 +60,10 @@ public class OrderController {
             redirectAttributes.addFlashAttribute("error", "Ваша корзина пуста");
             return "redirect:/cart";
         }
-        System.out.println(cartItems);
 
         try {
             orderService.payment(cartItems);
-            redirectAttributes.addFlashAttribute("succes", "Оплата произошло успешно");
+            redirectAttributes.addFlashAttribute("success", "Оплата произошло успешно");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
