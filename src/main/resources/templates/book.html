@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${book.title}">Название книги</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .book-cover {
+            max-height: 500px;
+            object-fit: contain;
+        }
+        .stock-badge {
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="/">Книжный магазин</a>
+        <div class="d-flex align-items-center" th:if="${#authentication != null and !#authentication.principal.equals('anonymousUser')}">
+            <!--            <span th:text="${#authentication}"></span>-->
+            <!--            <span th:text="${#authentication.isAuthenticated()}"></span>-->
+            <span class="text-white me-3">
+                <span th:text="${#authentication.name}"></span>
+                <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">— Админ</span>
+                <span th:if="${#authorization.expression('hasRole(''EMPLOYEE'')')}">— Сотрудник</span>
+                <span th:if="${#authorization.expression('hasRole(''CLIENT'')')}">— Клиент</span>
+            </span>
+            <a th:href="@{/cart}" class="btn btn-outline-light me-2">
+                <i class="bi bi-cart"></i> Корзина
+            </a>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="btn btn-outline-light">
+                    <i class="bi bi-box-arrow-right"></i> Выйти
+                </button>
+            </form>
+        </div>
+        <div th:unless="${#authentication != null and !#authentication.principal.equals('anonymousUser')}">
+            <a th:href="@{/login}" class="btn btn-outline-light">Войти</a>
+        </div>
+    </div>
+</nav>
+<div class="container py-5">
+    <!-- Карточка книги -->
+    <div class="row g-5">
+        <!-- Колонка с изображением -->
+        <div class="col-md-5">
+            <img th:src="@{'/images/' + ${book.imagePath}}"
+                 th:alt="${book.title}"
+                 class="img-fluid rounded shadow book-cover"
+                 onerror="this.src='/images/default-book.jpg'">
+        </div>
+
+        <!-- Колонка с информацией -->
+        <div class="col-md-7">
+            <h1 class="mb-3" th:text="${book.title}">Название книги</h1>
+
+            <!-- Автор и рейтинг -->
+            <div class="d-flex align-items-center mb-3">
+                <h4 class="text-muted me-3" th:text="${book.author}">Автор</h4>
+                <div class="rating" th:if="${book.rating != null}">
+                    <span class="badge bg-warning text-dark">
+                        ★ <span th:text="${#numbers.formatDecimal(book.rating, 1, 1)}">5.0</span>/10
+                    </span>
+                </div>
+            </div>
+
+            <!-- Статус наличия -->
+            <div class="mb-4">
+                <span th:switch="${book.stockQuantity}" class="stock-badge">
+                    <span th:case="0" class="badge bg-danger">Нет в наличии</span>
+                    <span th:case="*" th:if="${book.stockQuantity < 5}"
+                          class="badge bg-warning text-dark">
+                        Осталось мало: <span th:text="${book.stockQuantity}"></span> шт.
+                    </span>
+                    <span th:case="*" class="badge bg-success">В наличии</span>
+                </span>
+                <span th:if="${book.new}" class="badge bg-info ms-2">Новинка</span>
+            </div>
+
+            <!-- Описание -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Описание</h5>
+                    <p class="card-text" th:text="${book.description} ?: 'Описание отсутствует'">
+                        Здесь должно быть описание книги...
+                    </p>
+                </div>
+            </div>
+
+            <!-- Характеристики -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Характеристики</h5>
+                    <ul class="list-unstyled">
+                        <li><strong>Язык:</strong> <span th:text="${book.language}">Русский</span></li>
+                        <li><strong>Год издания:</strong> <span th:text="${book.publicationYear}">2023</span></li>
+                        <li><strong>Страниц:</strong> <span th:text="${book.pageCount}">300</span></li>
+                        <li><strong>ISBN:</strong> <span th:text="${book.isbn} ?: 'не указан'">978-5-12345-678-9</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+            <!-- Блок заказа -->
+            <div class="card border-primary">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h3 class="text-primary mb-0" th:text="'₽' + ${#numbers.formatDecimal(book.price, 1, 2)}">999.00 ₽</h3>
+
+                        <!-- Форма заказа -->
+                        <form th:if="${book.stockQuantity > 0}" th:action="@{/order/add}" method="post" th:object="${book}">
+                            <input type="hidden" name="bookId" th:value="${book.id}">
+                            <div class="input-group">
+                                <input type="number" name="quantity"
+                                       class="form-control"
+                                       min="1"
+                                       th:max="${book.stockQuantity}"
+                                       value="1"
+                                       style="width: 70px;">
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="bi bi-cart-plus"></i> Заказать
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
