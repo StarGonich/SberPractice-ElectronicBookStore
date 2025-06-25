@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.sber.practice.model.Client;
 import ru.sber.practice.service.ClientService;
 
@@ -26,20 +27,15 @@ public class ClientController {
         return "register";
     }
 
-//    @PostMapping(path = "/register")
-//    public Client registerClient(@RequestBody Client client) {
-//        return clientService.registerClient(client);
-//    }
-
     @PostMapping(path = "/register")
-    public String registerClient(@ModelAttribute Client client, Model model) {
+    public String registerClient(@ModelAttribute Client client, RedirectAttributes redirectAttributes) {
         try {
             clientService.registerClient(client);
-            model.addAttribute("success", "Регистрация прошла успешно!");
+            redirectAttributes.addFlashAttribute("success", "Регистрация прошла успешно!");
         } catch (IllegalStateException e) {
-            model.addAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "register";
+        return "redirect:/register";
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

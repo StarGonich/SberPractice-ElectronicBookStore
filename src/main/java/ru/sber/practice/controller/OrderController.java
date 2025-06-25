@@ -4,14 +4,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import ru.sber.practice.model.Book;
-import ru.sber.practice.model.Client;
 import ru.sber.practice.model.Order;
-import ru.sber.practice.model.OrderStatus;
 import ru.sber.practice.service.OrderService;
 
 import java.math.BigDecimal;

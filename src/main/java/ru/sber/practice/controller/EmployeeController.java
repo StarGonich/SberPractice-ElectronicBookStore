@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.sber.practice.model.Client;
 import ru.sber.practice.model.Employee;
 import ru.sber.practice.service.EmployeeService;
@@ -27,13 +28,13 @@ public class EmployeeController {
 
     @PostMapping("admin/employees")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public String addEmployee(@ModelAttribute Employee employee, Model model) {
+    public String addEmployee(@ModelAttribute Employee employee, RedirectAttributes redirectAttributes) {
         try {
             employeeService.addEmployee(employee);
-            model.addAttribute("success", "Добавление произошло успешно!");
+            redirectAttributes.addFlashAttribute("success", "Добавление произошло успешно!");
         } catch (IllegalStateException e) {
-            model.addAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "admin/add-employee";
+        return "redirect:/admin/add-employee";
     }
 }

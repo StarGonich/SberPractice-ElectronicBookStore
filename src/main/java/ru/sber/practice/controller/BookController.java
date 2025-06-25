@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.sber.practice.model.Book;
 import ru.sber.practice.service.BookService;
 
@@ -43,13 +44,13 @@ public class BookController {
 
     @PreAuthorize("hasAuthority('ROLE_EMPLOYEE')")
     @PostMapping("employee/add-book")
-    public String addBook(@ModelAttribute Book book, Model model) {
+    public String addBook(@ModelAttribute Book book, RedirectAttributes redirectAttributes) {
         try {
             bookService.addBook(book);
-            model.addAttribute("success", "Книга успешно добавлена");
+            redirectAttributes.addFlashAttribute("success", "Книга успешно добавлена");
         } catch (Exception e) {
-            model.addAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "employee/add-book";
+        return "redirect:/employee/add-book";
     }
 }
