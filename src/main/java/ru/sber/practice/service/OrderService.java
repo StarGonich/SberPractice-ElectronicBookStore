@@ -1,5 +1,6 @@
 package ru.sber.practice.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import ru.sber.practice.model.Order;
@@ -27,56 +28,50 @@ public class OrderService {
         this.bookRepository = bookRepository;
     }
 
-    public Order addToCart(String nickname, int bookId, int count) {
-        Optional<Client> client = clientRepository.findByNickname(nickname);
-        if (client.isEmpty()) {
-            throw new IllegalStateException("Клиент с таким Nickname не существует");
-        }
+    public Client getClient(String nickname) {
+        return clientRepository.findByNickname(nickname)
+                .orElseThrow(() -> new EntityNotFoundException("Клиент с nickname='" + nickname + "' не найден"));
+    }
 
-        Optional<Book> book = bookRepository.findById(bookId);
-        if (book.isEmpty()) {
-            throw new IllegalStateException("Книга с таким ID не существует");
-        }
+    public Book getBook(int id) {
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Книга с id='" + id + "' не найден"));
+    }
 
-        Optional<Order> existingOrder = orderRepository.findInCartByClientAndBook(client.get().getId(), bookId);
+    public void addToCart(String nickname, int bookId, int count) {
+        Client client = getClient(nickname);
+        Book book = getBook(bookId);
+
+        Optional<Order> existingOrder = orderRepository.findInCartByClientAndBook(client.getId(), bookId);
 
         if (existingOrder.isPresent()) {
             Order order = existingOrder.get();
             int newCount = order.getCount() + count;
-            if (newCount > book.get().getStockQuantity()) {
+            if (newCount > book.getStockQuantity()) {
                 throw new IllegalStateException("Запрашиваемое количество превышает доступный запас книги");
             }
             order.setCount(newCount);
             orderRepository.save(order);
-            return order;
         } else {
-            if (count > book.get().getStockQuantity()) {
+            if (count > book.getStockQuantity()) {
                 throw new IllegalStateException("Запрашиваемое количество превышает доступный запас книги");
             }
             Order order = new Order();
-            order.setClient(client.get());
-            order.setBook(book.get());
+            order.setClient(client);
+            order.setBook(book);
             order.setCount(count);
             order.setStatus(OrderStatus.in_cart);
             orderRepository.save(order);
-            return order;
         }
     }
 
-    public List<Order> findAllOrdersInCart(String nickname) {
-        Optional<Client> client = clientRepository.findByNickname(nickname);
-        if (client.isEmpty()) {
-            throw new IllegalStateException("Клиент с таким Nickname не существует");
-        }
-        return orderRepository.findAllInCart(client.get().getId());
+    public List<Order> findAllOrdersInCart(Client client) {
+        return orderRepository.findAllInCart(client.getId());
     }
 
     public List<Order> findAllOrdersShipped(String nickname) {
-        Optional<Client> client = clientRepository.findByNickname(nickname);
-        if (client.isEmpty()) {
-            throw new IllegalStateException("Клиент с таким Nickname не существует");
-        }
-        return orderRepository.findAllShipped(client.get().getId());
+        Client client = getClient(nickname);
+        return orderRepository.findAllShipped(client.getId());
     }
 
     public BigDecimal calculateTotalPrice(List<Order> cartItems) {
@@ -85,8 +80,15 @@ public class OrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    public void updateClientDeliveryInfo(Client client, String phone, String address) {
+        client.setPhone(phone);
+        client.setAddress(address);
+        clientRepository.save(client);
+    }
+
+    // Такая проверка позволяет узнать количество книг на самый последний момент
     public int getStockQuantity(Order order) {
-        Book book = bookRepository.findById(order.getBook().getId()).get();
+        Book book = getBook(order.getBook().getId()); //Почему так, написано выше
         return book.getStockQuantity();
     }
 
@@ -105,5 +107,11 @@ public class OrderService {
             bookRepository.save(book);
             item.setStatus(OrderStatus.shipped);
         }
+    }
+
+    public void deleteOrder(int id) {
+        orderRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Заказ с id='" + id + "' не найден"));
+        orderRepository.deleteById(id);
     }
 }

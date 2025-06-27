@@ -12,10 +12,10 @@
     <div class="container">
         <a class="navbar-brand" href="/">Книжный магазин</a>
         <div class="d-flex align-items-center">
-            <span class="text-white me-3" th:text="${#authentication.name}">User</span>
-            <span class="text-white me-3">— Клиент</span>
-            <a th:href="@{/}" class="btn btn-outline-light me-2">
-                <i class="bi bi-house"></i> На главную
+            <span class="text-white" th:text="${#authentication.name}">User</span>
+            <span class="text-white me-3"> — Клиент</span>
+            <a th:href="@{/shopping-history}" class="btn btn-outline-light me-2">
+                <i class="bi bi-clock-history"></i> История заказов
             </a>
             <form th:action="@{/logout}" method="post" class="d-inline">
                 <button type="submit" class="btn btn-outline-light">
@@ -26,7 +26,6 @@
     </div>
 </nav>
 
-<!-- Основное содержимое -->
 <div class="container">
     <div class="row">
         <div class="col-lg-8">
@@ -60,13 +59,14 @@
                         <div class="col-md-2 text-end">
                             <span th:text="${'₽' + #numbers.formatDecimal(item.book.price * item.count, 1, 2)}"></span>
                         </div>
-<!--                        <div class="col-md-1 text-end">-->
-<!--                            <form th:action="@{'/cart/remove/' + ${item.id}}" method="post">-->
-<!--                                <button type="submit" class="btn btn-danger btn-sm">-->
-<!--                                    <i class="bi bi-trash"></i>-->
-<!--                                </button>-->
-<!--                            </form>-->
-<!--                        </div>-->
+                        <div class="col-md-1 text-end">
+                            <form th:action="@{/cart/remove}" method="post">
+                                <input type="hidden" name="id" th:value="${item.id}"/>
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
                     <!-- Пустая корзина -->
@@ -95,14 +95,38 @@
                         <span>Бесплатно</span>
                     </div>
                     <hr>
-                    <div class="d-flex justify-content-between fw-bold">
+                    <div class="d-flex justify-content-between fw-bold mb-2">
                         <span>К оплате</span>
                         <span th:text="${'₽' + #numbers.formatDecimal(totalPrice, 1, 2)}"></span>
                     </div>
-                    <form th:action="@{/cart/payment}" method="post"
-                          th:disabled="${cartItems == null or cartItems.empty}"
-                          th:object="${cartItems}">
-                        <button class="btn btn-primary w-100 mt-3" type="submit">Оформить заказ</button>
+                    <hr>
+                    <div th:if="${phone != null and address != null}">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Телефон</span>
+                            <span th:text="${phone}">+88005553535</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Адрес</span>
+                            <span th:text="${address}">Куда-нибудь</span>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/cart/payment}" method="post" th:object="${cartItems}">
+                        <div th:if="${phone == null or address == null}">
+                            <div th:if="${phone == null}" class="mb-3">
+                                <label class="form-label" for="phone">Телефон</label>
+                                <input class="form-control" id="phone" type="tel" name="phone" required
+                                       pattern="\+?[0-9\s\-\(\)]+" title="Введите корректный номер телефона">
+                            </div>
+                            <input th:unless="${phone == null}" type="hidden" name="phone" th:value="${phone}">
+                            <div th:if="${address == null}" class="mb-3">
+                                <label class="form-label" for="address" >Адрес</label>
+                                <input class="form-control" id="address" type="text" name="address" required>
+                            </div>
+                            <input th:unless="${address == null}" type="hidden" name="address" th:value="${address}">
+                        </div>
+                        <button class="btn btn-primary w-100 mt-3" type="submit"
+                                th:disabled="${cartItems == null or cartItems.empty}">Оформить заказ</button>
                     </form>
                 </div>
             </div>
