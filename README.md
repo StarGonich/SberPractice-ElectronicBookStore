@@ -1,1 +1,1 @@
-![[видос.gif]]
+![Демонстрация](demonstration.gif)
