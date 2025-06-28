@@ -17,6 +17,4 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     @Query(value = "select * from orders where client_id = :clientId and book_id = :bookId and status = 'in_cart'",
             nativeQuery = true)
     Optional<Order> findInCartByClientAndBook(int clientId, int bookId);
-
-    Optional<Order> findById(int id);
 }

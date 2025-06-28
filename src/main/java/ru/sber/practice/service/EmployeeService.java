@@ -1,5 +1,6 @@
 package ru.sber.practice.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,6 +11,8 @@ import ru.sber.practice.config.EmployeeDetails;
 import ru.sber.practice.model.Employee;
 import ru.sber.practice.repository.EmployeeRepository;
 
+import java.util.List;
+
 @Service
 public class EmployeeService implements UserDetailsService {
     private final EmployeeRepository employeeRepository;
@@ -18,6 +21,10 @@ public class EmployeeService implements UserDetailsService {
     public EmployeeService(EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder) {
         this.employeeRepository = employeeRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    public List<Employee> getAllEmployees() {
+        return employeeRepository.findAll();
     }
 
     public Employee addEmployee(Employee employee) {
@@ -37,5 +44,11 @@ public class EmployeeService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return new EmployeeDetails(employeeRepository.findByNickname(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username + "сотрудник не найден")));
+    }
+
+    public void deleteEmployee(int id) {
+        employeeRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Сотрудник с id='" + id + "' не найден"));
+        employeeRepository.deleteById(id);
     }
 }

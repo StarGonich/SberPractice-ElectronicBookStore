@@ -6,6 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.sber.practice.model.Client;
 import ru.sber.practice.model.Employee;
@@ -22,8 +23,9 @@ public class EmployeeController {
     @GetMapping("admin/employees")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public String showAddEmployeeForm(Model model) {
+        model.addAttribute("employees", employeeService.getAllEmployees());
         model.addAttribute("employee", new Employee());
-        return "admin/add-employee";
+        return "admin/employees";
     }
 
     @PostMapping("admin/employees")
@@ -35,6 +37,14 @@ public class EmployeeController {
         } catch (IllegalStateException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/admin/add-employee";
+        return "redirect:/admin/employees";
     }
+
+    @PostMapping("admin/employee/delete")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public String deleteEmployee(@RequestParam int id) {
+        employeeService.deleteEmployee(id);
+        return "redirect:/admin/employees";
+    }
+
 }

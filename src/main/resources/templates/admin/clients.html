@@ -13,7 +13,8 @@
     </div>
 
     <ul class="list-group list-group-flush" id="clientsList">
-        <li th:each="client:${clients}" class="list-group-item client-item">
+        <li th:each="client:${clients}" class="list-group-item">
+            <p class="client-id" th:text="'ID: ' + ${client.id}"></p>
             <p class="client-nickname" th:text="'Никнейм: ' + ${client.nickname}"></p>
             <p class="client-email" th:text="'Почта: ' + ${client.email}"></p>
             <p class="client-phone" th:text="'Телефон: ' + ${client.phone}"></p>
@@ -26,7 +27,7 @@
     function searchClients() {
         const input = document.getElementById('searchInput');
         const filter = input.value.toLowerCase();
-        const items = document.getElementsByClassName('client-item');
+        const items = document.getElementsByClassName('list-group-item');
 
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
