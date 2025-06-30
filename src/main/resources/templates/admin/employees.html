@@ -16,6 +16,8 @@
                 </div>
 
                 <div class="card-body">
+                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+                    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <input type="text" id="searchInput" class="form-control"
@@ -44,12 +46,12 @@
                                 <td class="e-n" th:text="${employee.nickname}"></td>
                                 <td class="e-e" th:text="${employee.email}"></td>
                                 <td>
-<!--                                    <button class="btn btn-sm btn-info me-2" data-bs-toggle="modal"-->
-<!--                                            data-bs-target="#editEmployeeModal"-->
-<!--                                            th:attr="data-id=${employee.id}, data-nickname=${employee.nickname},-->
-<!--                                                             data-email=${employee.email}, data-password=${employee.password}">-->
-<!--                                        Изменить данные-->
-<!--                                    </button>-->
+                                    <button class="btn btn-sm btn-info me-2" data-bs-toggle="modal"
+                                            data-bs-target="#editEmployeeModal"
+                                            th:attr="data-id=${employee.id}, data-nickname=${employee.nickname},
+                                                             data-email=${employee.email}">
+                                        Редактировать
+                                    </button>
                                     <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
                                             data-bs-target="#deleteEmployeeModal"
                                             th:attr="data-id=${employee.id}">
@@ -104,21 +106,20 @@
                 <h5 class="modal-title" id="editEmployeeModalLabel">Редактировать сотрудника</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form th:action="@{/employees/{id}(id=${employee.id})}" th:object="${employee}" method="post">
-                <input type="hidden" name="_method" value="put">
-                <input type="hidden" id="editId" name="id">
+            <form th:action="@{/admin/employee/edit}" th:object="${employee}" method="post">
+                <input th:field="*{id}" type="hidden" id="editId">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="editNickname" class="form-label">Никнейм</label>
-                        <input type="text" class="form-control" id="editNickname" name="nickname" required>
+                        <input th:field="*{nickname}" type="text" class="form-control" id="editNickname" required>
                     </div>
                     <div class="mb-3">
                         <label for="editEmail" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="editEmail" name="email" required>
+                        <input th:field="*{email}" type="email" class="form-control" id="editEmail" name="email" required>
                     </div>
                     <div class="mb-3">
                         <label for="editPassword" class="form-label">Пароль</label>
-                        <input type="password" class="form-control" id="editPassword" name="password" required>
+                        <input th:field="*{password}" type="password" class="form-control" id="editPassword" name="password">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -178,6 +179,13 @@
         const button = event.relatedTarget;
         document.getElementById('deleteId').value = button.getAttribute('data-id');
     });
+
+    document.getElementById('editEmployeeModal').addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            document.getElementById('editId').value = button.getAttribute('data-id');
+            document.getElementById('editNickname').value = button.getAttribute('data-nickname');
+            document.getElementById('editEmail').value = button.getAttribute('data-email');
+        });
 </script>
 </body>
 </html>

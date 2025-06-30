@@ -27,7 +27,7 @@ public class EmployeeService implements UserDetailsService {
         return employeeRepository.findAll();
     }
 
-    public Employee addEmployee(Employee employee) {
+    public void addEmployee(Employee employee) {
         if (employeeRepository.findByNickname(employee.getNickname()).isPresent()) {
             throw new IllegalStateException("Данный nickname уже занят");
         }
@@ -37,18 +37,44 @@ public class EmployeeService implements UserDetailsService {
         }
 
         employee.setPassword(passwordEncoder.encode(employee.getPassword()));
-        return employeeRepository.save(employee);
+        employeeRepository.save(employee);
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return new EmployeeDetails(employeeRepository.findByNickname(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username + "сотрудник не найден")));
+    public void editEmployee(Employee updatedEmployee) {
+        Employee existingEmployee = employeeRepository.findById(updatedEmployee.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Сотрудник с id='" + updatedEmployee.getId() + "' не найден"));
+
+        if (!existingEmployee.getNickname().equals(updatedEmployee.getNickname())) {
+            if (employeeRepository.findByNickname(updatedEmployee.getNickname()).isPresent()) {
+                throw new IllegalStateException("Данный nickname уже занят");
+            }
+            existingEmployee.setNickname(updatedEmployee.getNickname());
+        }
+
+        if (!existingEmployee.getEmail().equals(updatedEmployee.getEmail())) {
+            if (employeeRepository.findByEmail(updatedEmployee.getEmail()).isPresent()) {
+                throw new IllegalStateException("Пользователь с таким email уже существует");
+            }
+            existingEmployee.setEmail(updatedEmployee.getEmail());
+        }
+
+        // Обновляем пароль только если он был изменен
+        if (updatedEmployee.getPassword() != null && !updatedEmployee.getPassword().isEmpty()) {
+            existingEmployee.setPassword(passwordEncoder.encode(updatedEmployee.getPassword()));
+        }
+
+        employeeRepository.save(existingEmployee);
     }
 
     public void deleteEmployee(int id) {
         employeeRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Сотрудник с id='" + id + "' не найден"));
         employeeRepository.deleteById(id);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return new EmployeeDetails(employeeRepository.findByNickname(username)
+                .orElseThrow(() -> new UsernameNotFoundException(username + "сотрудник не найден")));
     }
 }

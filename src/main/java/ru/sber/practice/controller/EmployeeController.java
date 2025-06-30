@@ -40,10 +40,29 @@ public class EmployeeController {
         return "redirect:/admin/employees";
     }
 
+    @PostMapping("admin/employee/edit")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public String editEmployee(@ModelAttribute Employee employee, RedirectAttributes redirectAttributes) {
+        try {
+            employeeService.editEmployee(employee);
+            redirectAttributes.addFlashAttribute(
+                    "success", "Редактирование сотрудника с id="+employee.getId()+" произошло успешно!");
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/employees";
+    }
+
     @PostMapping("admin/employee/delete")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public String deleteEmployee(@RequestParam int id) {
-        employeeService.deleteEmployee(id);
+    public String deleteEmployee(@RequestParam int id, RedirectAttributes redirectAttributes) {
+        try {
+            employeeService.deleteEmployee(id);
+            redirectAttributes.addFlashAttribute(
+                    "success", "Удаление сотрудника с id="+id+" произошло успешно!");
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
         return "redirect:/admin/employees";
     }
 
