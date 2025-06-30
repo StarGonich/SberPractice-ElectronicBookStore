@@ -114,4 +114,14 @@ public class OrderService {
                 .orElseThrow(() -> new EntityNotFoundException("Заказ с id='" + id + "' не найден"));
         orderRepository.deleteById(id);
     }
+
+    public int getBookQuantityInCart(String nickname, int bookId) {
+        Client client = getClient(nickname);
+        Optional<Order> existingOrder = orderRepository.findInCartByClientAndBook(client.getId(), bookId);
+        int count = 0;
+        if (existingOrder.isPresent()) {
+            count = existingOrder.get().getCount();
+        }
+        return count;
+    }
 }

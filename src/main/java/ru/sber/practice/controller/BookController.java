@@ -9,16 +9,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.sber.practice.model.Book;
+import ru.sber.practice.model.Client;
 import ru.sber.practice.service.BookService;
+import ru.sber.practice.service.OrderService;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
 public class BookController {
     private final BookService bookService;
+    private final OrderService orderService;
 
-    public BookController(BookService bookService) {
+    public BookController(BookService bookService, OrderService orderService) {
         this.bookService = bookService;
+        this.orderService = orderService;
     }
 
     @GetMapping
@@ -29,9 +34,18 @@ public class BookController {
     }
 
     @GetMapping("/book")
-    public String showBookDetails(@RequestParam Integer id, Model model) {
-        Book book = bookService.findBookByID(id);
+    public String showBookDetails(@RequestParam(name = "id") int bookId, Model model, Principal principal) {
+        Book book = bookService.findBookByID(bookId);
         model.addAttribute("book", book);
+        if (principal != null) {
+            String nickname = principal.getName();
+            try {
+                int quantityInCart = orderService.getBookQuantityInCart(nickname, bookId);
+                model.addAttribute("quantityInCart", quantityInCart);
+            } catch (Exception e) {
+                model.addAttribute("error", e.getMessage());
+            }
+        }
         return "book";
     }
 
