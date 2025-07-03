@@ -1,6 +1,7 @@
 package ru.sber.practice.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,14 +15,10 @@ import ru.sber.practice.repository.EmployeeRepository;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class EmployeeService implements UserDetailsService {
     private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
-
-    public EmployeeService(EmployeeRepository employeeRepository, PasswordEncoder passwordEncoder) {
-        this.employeeRepository = employeeRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();

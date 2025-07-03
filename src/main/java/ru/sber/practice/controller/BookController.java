@@ -1,6 +1,9 @@
 package ru.sber.practice.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,22 +12,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.sber.practice.model.Book;
-import ru.sber.practice.model.Client;
 import ru.sber.practice.service.BookService;
 import ru.sber.practice.service.OrderService;
 
-import java.security.Principal;
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 public class BookController {
     private final BookService bookService;
     private final OrderService orderService;
-
-    public BookController(BookService bookService, OrderService orderService) {
-        this.bookService = bookService;
-        this.orderService = orderService;
-    }
 
     @GetMapping
     public String showHomePage(Model model) {
@@ -34,11 +31,13 @@ public class BookController {
     }
 
     @GetMapping("/book")
-    public String showBookDetails(@RequestParam(name = "id") int bookId, Model model, Principal principal) {
+    public String showBookDetails(@RequestParam(name = "id") int bookId, Model model,
+                                  @AuthenticationPrincipal UserDetails userDetails) {
         Book book = bookService.findBookByID(bookId);
         model.addAttribute("book", book);
-        if (principal != null) {
-            String nickname = principal.getName();
+        if (userDetails != null &&  userDetails.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_CLIENT"))) {
+            String nickname = userDetails.getUsername();
             try {
                 int quantityInCart = orderService.getBookQuantityInCart(nickname, bookId);
                 model.addAttribute("quantityInCart", quantityInCart);

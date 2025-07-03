@@ -2,6 +2,7 @@ package ru.sber.practice.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.sber.practice.model.Order;
 import ru.sber.practice.model.Client;
@@ -16,17 +17,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
     private final ClientRepository clientRepository;
     private final BookRepository bookRepository;
-
-
-    public OrderService(OrderRepository orderRepository, ClientRepository clientRepository, BookRepository bookRepository) {
-        this.orderRepository = orderRepository;
-        this.clientRepository = clientRepository;
-        this.bookRepository = bookRepository;
-    }
 
     public Client getClient(String nickname) {
         return clientRepository.findByNickname(nickname)
@@ -86,7 +81,6 @@ public class OrderService {
         clientRepository.save(client);
     }
 
-    // Такая проверка позволяет узнать количество книг на самый последний момент
     public int getStockQuantity(Order order) {
         Book book = getBook(order.getBook().getId()); //Почему так, написано выше
         return book.getStockQuantity();

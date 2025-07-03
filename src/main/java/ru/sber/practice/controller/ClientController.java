@@ -1,5 +1,6 @@
 package ru.sber.practice.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,12 +15,9 @@ import ru.sber.practice.service.ClientService;
 import java.util.List;
 
 @Controller
+@RequiredArgsConstructor
 public class ClientController {
     private final ClientService clientService;
-
-    public ClientController(ClientService clientService) {
-        this.clientService = clientService;
-    }
 
     @GetMapping("/register")
     public String showRegistrationForm(Model model) {

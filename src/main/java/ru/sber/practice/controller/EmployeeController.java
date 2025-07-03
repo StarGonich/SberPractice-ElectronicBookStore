@@ -1,5 +1,6 @@
 package ru.sber.practice.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,12 +14,9 @@ import ru.sber.practice.model.Employee;
 import ru.sber.practice.service.EmployeeService;
 
 @Controller
+@RequiredArgsConstructor
 public class EmployeeController {
     private final EmployeeService employeeService;
-
-    public EmployeeController(EmployeeService employeeService) {
-        this.employeeService = employeeService;
-    }
 
     @GetMapping("admin/employees")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

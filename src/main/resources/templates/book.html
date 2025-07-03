@@ -65,7 +65,7 @@
                     </span>
                     <span th:case="*" class="badge bg-success">В наличии</span>
                 </span>
-                <span th:if="${book.new}" class="badge bg-info ms-2">Новинка</span>
+                <span th:if="${book.isNew}" class="badge bg-info ms-2">Новинка</span>
             </div>
 
             <div class="card mb-4">

@@ -1,5 +1,6 @@
 package ru.sber.practice.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.sber.practice.model.Book;
 import ru.sber.practice.repository.BookRepository;
@@ -7,12 +8,9 @@ import ru.sber.practice.repository.BookRepository;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class BookService {
     private final BookRepository bookRepository;
-
-    public BookService(BookRepository bookRepository) {
-        this.bookRepository = bookRepository;
-    }
 
     public List<Book> findAllBooks() {
         return bookRepository.findAll();

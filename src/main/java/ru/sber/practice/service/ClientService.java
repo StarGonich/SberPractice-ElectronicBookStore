@@ -1,5 +1,6 @@
 package ru.sber.practice.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,14 +13,10 @@ import ru.sber.practice.repository.ClientRepository;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ClientService implements UserDetailsService {
     private final ClientRepository clientRepository;
     private final PasswordEncoder passwordEncoder;
-
-    public ClientService(ClientRepository clientRepository, PasswordEncoder passwordEncoder) {
-        this.clientRepository = clientRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     public Client registerClient(Client client) {
         if (clientRepository.findByNickname(client.getNickname()).isPresent()) {
