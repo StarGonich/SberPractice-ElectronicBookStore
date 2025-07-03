@@ -13,6 +13,7 @@ import ru.sber.practice.repository.ClientRepository;
 import ru.sber.practice.repository.OrderRepository;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -88,6 +89,7 @@ public class OrderService {
 
     @Transactional
     public void payment(List<Order> cartItems) {
+        ZonedDateTime date = ZonedDateTime.now();
         for (Order item : cartItems) {
             int stockQuantity = getStockQuantity(item);
             int count = item.getCount();
@@ -100,6 +102,7 @@ public class OrderService {
             book.setStockQuantity(stockQuantity - count);
             bookRepository.save(book);
             item.setStatus(OrderStatus.shipped);
+            item.setDate(date);
         }
     }
 

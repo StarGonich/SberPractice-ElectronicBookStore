@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "orders")
@@ -29,5 +32,8 @@ public class Order {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
+
+    @CreationTimestamp
+    private ZonedDateTime date;
 }
 

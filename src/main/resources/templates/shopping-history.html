@@ -47,15 +47,18 @@
                 <div class="card-body">
                     <div th:each="item : ${orders}" class="row mb-2">
                         <div class="col-md-2">
+                            <span th:text="${#temporals.format(item.date, 'dd.MM.yyyy HH:mm')}"></span>
+                        </div>
+                        <div class="col-md-3">
                             <img th:src="@{'/images/' + ${item.book.imagePath}}"
                                  class="img-fluid rounded" style="width: 60px; height: 90px; object-fit: contain;"
                                  onerror="this.src='/images/default-book.jpg'">
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <h6 th:text="${item.book.title}"></h6>
                             <small class="text-muted" th:text="${item.book.author}"></small>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-1">
                             <span th:text="${item.count} + ' шт.'"></span>
                         </div>
                         <div class="col-md-2 text-end">
