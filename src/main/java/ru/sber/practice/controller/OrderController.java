@@ -97,7 +97,9 @@ public class OrderController {
     @PreAuthorize("hasAuthority('ROLE_CLIENT')")
     public String shoppingHistory(Principal principal, Model model) {
         String nickname = principal.getName();
-        model.addAttribute("orders", orderService.findAllOrdersShipped(nickname));
+        List<Order> orders = orderService.findAllOrdersShipped(nickname);
+//        orders.forEach(o -> System.out.println(o.getDate()));
+        model.addAttribute("orders", orders);
         return "shopping-history";
     }
 
