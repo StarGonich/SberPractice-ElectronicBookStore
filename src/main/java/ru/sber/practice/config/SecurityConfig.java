@@ -121,6 +121,7 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/admin/login")
+                        .defaultSuccessUrl("/", true)
 //                        .loginProcessingUrl("/admin/login")
                         .permitAll()
                 )
@@ -145,6 +146,7 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/employee/login")
+                        .defaultSuccessUrl("/", true)
 //                        .loginProcessingUrl("/employee/login")
                         .permitAll()
                 )

@@ -18,12 +18,25 @@
                 <span th:if="${#authorization.expression('hasRole(''EMPLOYEE'')')}">— Сотрудник</span>
                 <span th:if="${#authorization.expression('hasRole(''CLIENT'')')}">— Клиент</span>
             </span>
-            <a th:href="@{/cart}" class="btn btn-outline-light me-2">
+
+            <a th:if="${#authorization.expression('hasRole(''CLIENT'')')}" th:href="@{/cart}" class="btn btn-outline-light me-2">
                 <i class="bi bi-cart"></i> Корзина
             </a>
-            <a th:href="@{/shopping-history}" class="btn btn-outline-light me-2">
+            <a th:if="${#authorization.expression('hasRole(''CLIENT'')')}" th:href="@{/shopping-history}" class="btn btn-outline-light me-2">
                 <i class="bi bi-clock-history"></i> История заказов
             </a>
+
+            <a th:href="@{/employee/add-book}" th:if="${#authorization.expression('hasRole(''EMPLOYEE'')')}" class="btn btn-outline-light me-2">
+                <i class="bi bi-journal-plus"></i> Добавить книгу
+            </a>
+
+            <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}" class="btn btn-outline-light me-2" href="/admin/clients">
+                <i class="bi bi-people"></i> Клиенты
+            </a>
+            <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}" class="btn btn-outline-light me-2" href="/admin/employees">
+                <i class="bi bi-person-badge"></i> Сотрудники
+            </a>
+
             <form th:action="@{/logout}" method="post">
                 <button type="submit" class="btn btn-outline-light">
                     <i class="bi bi-box-arrow-right"></i> Выйти
